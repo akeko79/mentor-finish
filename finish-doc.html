@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  html,body{margin:0;height:100%;background:transparent}
+  #mentor-finish{position:relative;height:100%;box-sizing:border-box;text-align:center;padding:30px 20px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;overflow:hidden}
+  #mentor-finish .mf-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+  #mentor-finish .mf-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center}
+  #mentor-finish .mf-btn{font-family:inherit;font-size:1.05rem;font-weight:600;color:#fff;background:#5E9E30;
+    border:0;border-radius:999px;padding:15px 30px;cursor:pointer;
+    box-shadow:0 10px 24px -10px rgba(94,158,48,.7);transition:transform .12s ease,background .15s ease}
+  #mentor-finish .mf-btn:hover{background:#3E7A21}
+  #mentor-finish .mf-btn:active{transform:translateY(1px)}
+  #mentor-finish .mf-btn:focus-visible{outline:3px solid #C08423;outline-offset:3px}
+  #mentor-finish .mf-reveal{display:none;flex-direction:column;align-items:center}
+  #mentor-finish.is-done .mf-btn{display:none}
+  #mentor-finish.is-done .mf-reveal{display:flex}
+  #mentor-finish .mf-trophy{animation:mfPop .7s cubic-bezier(.2,1.3,.4,1) both}
+  #mentor-finish .mf-title{font-family:Georgia,'Times New Roman',serif;font-weight:600;color:#23271F;
+    font-size:clamp(1.4rem,3.4vw,1.9rem);line-height:1.15;margin:18px 0 0;max-width:20ch;animation:mfRise .6s ease .18s both}
+  #mentor-finish .mf-sub{color:#5C6257;font-size:1.05rem;margin:10px 0 0;animation:mfRise .6s ease .3s both}
+  @keyframes mfPop{0%{opacity:0;transform:scale(.4) translateY(10px)}100%{opacity:1;transform:none}}
+  @keyframes mfRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){#mentor-finish .mf-trophy,#mentor-finish .mf-title,#mentor-finish .mf-sub{animation:none}}
+</style>
+</head>
+<body>
+<div id="mentor-finish">
+  <canvas class="mf-canvas"></canvas>
+  <div class="mf-inner">
+    <button type="button" class="mf-btn">Завершить курс</button>
+    <div class="mf-reveal" aria-live="polite">
+      <div class="mf-trophy">
+        <svg viewBox="0 0 120 128" width="128" height="136" aria-hidden="true">
+          <defs>
+            <linearGradient id="mfGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F0D488"/><stop offset=".5" stop-color="#D9A441"/><stop offset="1" stop-color="#B67A1F"/></linearGradient>
+            <linearGradient id="mfGold2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E7C069"/><stop offset="1" stop-color="#B67A1F"/></linearGradient>
+          </defs>
+          <path d="M32 34 C16 34 14 56 33 60" fill="none" stroke="#C08423" stroke-width="5" stroke-linecap="round"/>
+          <path d="M88 34 C104 34 106 56 87 60" fill="none" stroke="#C08423" stroke-width="5" stroke-linecap="round"/>
+          <path d="M30 24 H90 V42 C90 61 77 74 60 74 C43 74 30 61 30 42 Z" fill="url(#mfGold)" stroke="#9C6416" stroke-width="2"/>
+          <rect x="55" y="73" width="10" height="14" fill="url(#mfGold2)"/>
+          <path d="M44 100 L48 87 H72 L76 100 Z" fill="url(#mfGold2)" stroke="#9C6416" stroke-width="1.5"/>
+          <rect x="40" y="100" width="40" height="7" rx="3" fill="url(#mfGold)" stroke="#9C6416" stroke-width="1.5"/>
+          <path d="M60 62 V48" stroke="#3E7A21" stroke-width="3" stroke-linecap="round"/>
+          <path d="M60 52 C51 50 47 43 49 36 C58 38 62 45 60 52 Z" fill="#5E9E30"/>
+          <path d="M60 52 C69 50 73 43 71 36 C62 38 58 45 60 52 Z" fill="#8FC64C"/>
+        </svg>
+      </div>
+      <h2 class="mf-title">Поздравляем с завершением курса ментора!</h2>
+      <p class="mf-sub">Успешной работы с менти!</p>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var root=document.getElementById('mentor-finish'); if(!root) return;
+  var btn=root.querySelector('.mf-btn'), canvas=root.querySelector('.mf-canvas'), ctx=canvas.getContext('2d');
+  var reduce=window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var colors=['#5E9E30','#8FC64C','#C08423','#E7C069','#CFC9BB','#3E7A21'];
+  var parts=[], raf=null, dpr=Math.min(window.devicePixelRatio||1,2);
+  function resize(){var r=root.getBoundingClientRect();canvas.width=Math.max(1,r.width*dpr);canvas.height=Math.max(1,r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);}
+  function burst(){var r=root.getBoundingClientRect(),cx=r.width/2,n=reduce?0:150;for(var i=0;i<n;i++){var a=Math.PI*2*Math.random(),sp=4+Math.random()*8;parts.push({x:cx+(Math.random()-.5)*80,y:r.height*0.32,vx:Math.cos(a)*sp*(0.6+Math.random()),vy:Math.sin(a)*sp-(4+Math.random()*4),g:0.16+Math.random()*0.1,size:5+Math.random()*7,rot:Math.random()*6.28,vr:(Math.random()-.5)*0.4,color:colors[(Math.random()*colors.length)|0],life:0,max:110+Math.random()*40,shape:Math.random()<.5?'rect':'circle'});}if(!raf)raf=requestAnimationFrame(tick);}
+  function tick(){var r=root.getBoundingClientRect();ctx.clearRect(0,0,r.width,r.height);for(var i=parts.length-1;i>=0;i--){var p=parts[i];p.life++;p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.vx*=0.99;p.rot+=p.vr;var alpha=Math.max(0,1-p.life/p.max);ctx.save();ctx.globalAlpha=alpha;ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.color;if(p.shape==='rect')ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);else{ctx.beginPath();ctx.arc(0,0,p.size/2,0,6.28);ctx.fill();}ctx.restore();if(p.life>=p.max||p.y>r.height+40)parts.splice(i,1);}if(parts.length)raf=requestAnimationFrame(tick);else{ctx.clearRect(0,0,r.width,r.height);raf=null;}}
+  function finish(){if(root.classList.contains('is-done'))return;resize();root.classList.add('is-done');burst();if(!reduce)setTimeout(burst,650);}
+  window.addEventListener('resize',function(){if(root.classList.contains('is-done'))resize();});
+  btn.addEventListener('click',finish);
+})();
+</script>
+</body>
+</html>
